@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>JPDB</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="http://login2explore.com/jpdb/resources/js/0.0.3/jpdb-commons.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Simple Account Creation Page</h2>
+      <form id="loginForm" method="post">
+        <div class="form-group">
+          <span
+            ><label for="username">User Name:</label>
+            <label id="userIdMsg"> </label
+          ></span>
+          <input
+            type="text"
+            class="form-control"
+            name="username"
+            id="username"
+            placeholder="Enter User Name"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Enter Password:</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            placeholder="Enter Password "
+            name="empName"
+          />
+        </div>
+        <input
+          type="button"
+          class="btn btn-primary"
+          id="userSave"
+          value="Save Account"
+          onclick="saveUser();"
+        />
+      </form>
+    </div>
+    <script>
+      $("#username").focus();
+      function validateAndGetFormData() {
+        var userIdVar = $("#username").val();
+        if (userIdVar === "") {
+          alert("User name required");
+          $("#username").focus();
+          return "";
+        }
+        var passwordVar = $("#password").val();
+        if (passwordVar === "") {
+          alert("Password is Required Value");
+          $("#password").focus();
+          return "";
+        }
+        var jsonStrObj = {
+          userId: userIdVar,
+          password: passwordVar,
+        };
+        return JSON.stringify(jsonStrObj);
+      }
+      function executeCommand(reqString, dbBaseUrl, apiEndPointUrl) {
+        var url = dbBaseUrl + apiEndPointUrl;
+        var jsonObj;
+        $.post(url, reqString, function (result) {
+          jsonObj = JSON.parse(result);
+        }).fail(function (result) {
+          var dataJsonObj = result.responseText;
+          jsonObj = JSON.parse(dataJsonObj);
+        });
+        return jsonObj;
+      }
+      function resetForm() {
+        $("#username").val("");
+        $("#password").val("");
+        $("#username").focus();
+      }
+      function saveUser() {
+        var jsonStr = validateAndGetFormData();
+        if (jsonStr === "") {
+          return;
+        }
+        var putReqStr = createPUTRequest(
+          "90937973|-31949265773196027|90953607",
+          jsonStr,
+          "UserDB",
+          "Users"
+        );
+        jQuery.ajaxSetup({ async: false });
+        var resultObj = executeCommandAtGivenBaseUrl(
+          putReqStr,
+          "http://api.login2explore.com:5577",
+          "/api/iml"
+        );
+        jQuery.ajaxSetup({ async: true });
+        resetForm();
+      }
+    </script>
+  </body>
+</html>
